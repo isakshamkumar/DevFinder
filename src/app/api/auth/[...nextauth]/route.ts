@@ -13,11 +13,9 @@ export const authOption:AuthOptions={
   providers: [
       GoogleProvider({
           clientId:
-            "604488456227-2r25b0ab74k4fo34vkertdql3dl1gimg.apps.googleusercontent.com" ||
-            "604488456227-2r25b0ab74k4fo34vkertdql3dl1gimg.apps.googleusercontent.com",
+           process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
           clientSecret:
-            "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" ||
-            "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",
+          process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET
         }),
     // ...add more providers here
   ],
