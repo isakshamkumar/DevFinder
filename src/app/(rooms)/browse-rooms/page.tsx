@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { Slider } from "@/components/ui/slider";
-import { Meteors } from "@/components/ui/meteor";
+// import { Meteors } from "@/components/ui/meteor";
 import {
   Pagination,
   PaginationContent,
@@ -36,13 +36,13 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Github } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { dummyProjects } from "@/app/data";
+// import { dummyProjects } from "@/app/data";
 import { getRooms } from "@/lib/getRooms";
 const SideFilterBar = () => {
-  const allTags = useMemo(() => {
-    return dummyProjects.flatMap((project) => project.tags);
-  }, []);
+  
   const [projects, setprojects] = useState([]);
+
+   
 
   const router = useRouter();
   const [filters, setFilters] = useState({
@@ -51,6 +51,7 @@ const SideFilterBar = () => {
     stars: 0, // Default range for stars
   });
   const [loading, setloading] = useState(false);
+  const[allTags,setAllTags]=useState([])
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevState) => ({
@@ -67,16 +68,39 @@ const SideFilterBar = () => {
       stars: e[0],
     }));
   };
+  const searchParams=useSearchParams()
+ 
+  
 
   useEffect(() => {
     setloading(true);
+    const projectName= searchParams.get("projectName") || "";
+    const language= searchParams.get("language") || "";
+    const stars= Number(searchParams.get("stars")) || 0;
+    console.log(projectName, language, stars,'sdfaasd');
+    
     const getAllRooms = async () => {
-      const rooms = await getRooms();
+      const rooms = await getRooms(projectName,language,stars);
       setprojects(rooms);
       setloading(false);
     };
     getAllRooms();
-  }, []);
+
+  }, [searchParams]);
+  useEffect(()=>{
+    const getAllRooms = async () => {
+      const projectName= searchParams.get("projectName") || "";
+    const language= searchParams.get("language") || "";
+    const stars= Number(searchParams.get("stars")) || 0;
+    const rooms = await getRooms(projectName,language,stars);
+     
+         const tags= rooms.flatMap((project) => project.tags.split(","));
+         //now check if tags do not repeat
+         const uniqueTags = tags.filter((tag, index) => tags.indexOf(tag) === index);
+        setAllTags(uniqueTags)
+    };
+    getAllRooms();
+  },[])
 
   const handleApplyFilters = () => {
     if (filters.language === "" || filters.projectName === "") {
@@ -99,32 +123,12 @@ const SideFilterBar = () => {
         .join("&");
 
       // Push the filtered route to the router
-      // router.push(`/${query}`);
-      // implement filterby language based on the tags
-      // const filteredProjects= dummyProjects.filter(proj=>proj.tags.includes(filters.language))
-      // setprojects(filteredProjects)
-      // // now filter project based on repostars
-      // const filteredProjects= dummyProjects.filter(proj=>proj.repoStars>=filters.stars)
-      // setprojects(filteredProjects)
-      // const fp= dummyProjects.filter(proj=>proj.tags.in)
-      // const filteredProjects= dummyProjects.filter(proj=>proj.title.trim().toLocaleLowerCase().includes(filters.projectName.trim().toLocaleLowerCase()))
-      // setprojects(filteredProjects)
-      // // now make a big filter that considers filter by stars, filter by language and filter by title
-      // const filteredProjects= dummyProjects.filter(proj=>proj.repoStars>=filters.stars&&proj.tags.includes(filters.language)&&proj.title.trim().toLocaleLowerCase().includes(filters.projectName.trim().toLocaleLowerCase()))
-      // setprojects(filteredProjects)
-      // but initially they will not be defined, orif user only wants to apply one filter then the && condition will fail, so refactor it
-      const filteredProjects = dummyProjects.filter(
-        (proj) =>
-          proj.repoStars >= filters.stars &&
-          proj.tags.includes(filters.language) &&
-          proj.title
-            .trim()
-            .toLocaleLowerCase()
-            .includes(filters.projectName.trim().toLocaleLowerCase())
-      );
-      // setprojects(filteredProjects)
+      router.push(`/browse-rooms?${query}`);
     }
   };
+  const handleRemoveFilter=async()=>{
+router.push(`/browse-rooms`)
+  }
 
   return (
     <div className="flex  relative ">
@@ -175,7 +179,7 @@ const SideFilterBar = () => {
               <SelectValue placeholder="Filter by Language" />
             </SelectTrigger>
             <SelectContent>
-              {allTags.map((tag, index) => (
+              {allTags?.map((tag, index) => (
                 <SelectItem value={tag} key={index}>
                   {tag}
                 </SelectItem>
@@ -202,6 +206,9 @@ const SideFilterBar = () => {
 
           <Button onClick={handleApplyFilters} variant={"destructive"}>
             Apply Filters
+          </Button>
+          <Button onClick={handleRemoveFilter} variant={"destructive"}>
+            Remove Filters
           </Button>
         </div>
       </div>
@@ -258,8 +265,8 @@ const SideFilterBar = () => {
               {[1, 2, 3, 4, 5].map((ele, index) => (
                 <Skeleton
                   key={index}
-                  className="p-2 pb-4 h-fit min-h-[310px] min-w-[300px] "
-                />
+                  className="p-2 flex justify-center items-center pb-4 h-fit min-h-[310px] min-w-[300px] "
+                >Getting Rooms...</Skeleton>
               ))}
             </div>
           </>

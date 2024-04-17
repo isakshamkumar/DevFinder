@@ -65,6 +65,7 @@ model Room{
   issue String
   tags String
   screenshots String[]
+  stars Int? @default(0)
   videos String[]
   userId String
   user User @relation(fields: [userId], references: [id], onDelete:Cascade)

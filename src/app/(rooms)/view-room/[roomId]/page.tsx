@@ -33,12 +33,15 @@ import { useSession } from "next-auth/react";
 import { generateTokenAction } from "@/lib/generateVideoToken";
 import { useEffect, useState } from "react";
 import { useCreateChatClient } from "@/app/hooks/useCreateChatClient";
+import { Skeleton } from "@/components/ui/skeleton";
 // ideally, Stream Video theme should be imported before your own styles
 // as this would make it easier for you to override certain video-theme rules
 // import './my-styles.css';
 
 export default function Video(props:{params:{roomId:string}}) {
   const roomId = props.params.roomId;
+  console.log(roomId,'roomid');
+  
   // // const room = dummyProjects.find((proj) => proj.id === parseInt(roomId));
   // const [client, setClient] = useState<any>(null);
   // const[call,setCall]=useState<any>(null)
@@ -46,6 +49,7 @@ export default function Video(props:{params:{roomId:string}}) {
   const apiKey = "ezumkcut4wyx";
   // const router = useRouter();
   // const session=useSession()
+  const[proj,setproj]=useState<any>(null);
   const [client, setClient] = useState<any>(null);
   const [call, setCall] = useState<any>(null);
   const router = useRouter();
@@ -58,6 +62,21 @@ export default function Video(props:{params:{roomId:string}}) {
   //   userData: user,
   // });
   useEffect(() => {
+    const getRoomDetails=async()=>{
+      const response=await fetch('/api/get-room',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          roomId:roomId
+        })
+      })
+      const data=await response.json()
+      setproj(data.room)
+    }
+    getRoomDetails()
+   
     if (session.status === "authenticated" && session.data?.user && !client) {
       console.log('use effect');
       
@@ -128,18 +147,18 @@ export default function Video(props:{params:{roomId:string}}) {
     //   members: [userId],
     //  });
     return (
-      <div className="grid grid-cols-4 min-h-screen">
-      <div className="col-span-3 p-4 pr-2">
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4 min-h-screen">
+      <div className="grid grid-cols-4 min-h-screen ">
+    
+        <div className="rounded-lg col-span-3 border bg-card text-card-foreground shadow-sm p-4 min-h-screen">
           {/* <Chat client={chatClient}> */}
             <StreamVideo client={client}>
               <StreamTheme>
                 <StreamCall call={call}>
                   <SpeakerLayout />
                   <CallControls onLeave={() => router.push("/browse-rooms")} />
-                  <div className="border">
+                
                    <CallParticipantsList onClose={() => undefined} />
-                  </div>
+                 
                 </StreamCall>
                 {/* <Channel channel={channel}> */}
                   {/* <MessageList /> */}
@@ -149,7 +168,47 @@ export default function Video(props:{params:{roomId:string}}) {
             </StreamVideo>
           {/* </Chat> */}
         </div>
-      </div>
+        <div className=" border-r border-b border-t col-span-1">
+          {proj ? <Card
+            key={proj.id}
+            style={{ backdropFilter: "blur(190px)" }}
+            className=" p-2 pb-4 h-fit S bg-transparent"
+          >
+            <CardHeader>
+              <CardTitle className="text-3xl text-gray-300">
+                {proj.name}
+              </CardTitle>
+              <CardDescription>{proj.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex gap-2 flex-wrap">
+              {proj.tags.split(",").map((tag, id) => (
+                <Badge
+                  key={id}
+                  className="px-3 py-1 bg-slate-300"
+                  variant="default"
+                >
+                  <Link href={"/"}>{tag}</Link>{" "}
+                </Badge>
+              ))}
+            </CardContent>
+            <Link
+              className={cn(buttonVariants({ variant: "link" }))}
+              href={"/"}
+            >
+              <Github className="mr-2" />{" "}
+              <span className="text-xl underline text-gray-200">
+                Project Github Link
+              </span>{" "}
+            </Link>
+            <CardDescription className="text-xl p-4">Issue: {proj.issue}</CardDescription>
+         
+          </Card>:<Skeleton
+                 
+                  className="p-2 pb-4 h-fit"
+                />}
+      
+        </div>
+     
       {/* Additional UI components can be placed here */}
    </div>
     )

@@ -112,21 +112,21 @@ export function Header() {
           DevFinder
         </Link>
 
-        <nav className="flex gap-8">
+        <nav >
           {isLoggedIn && (
-            <>
-              <Link className="hover:underline" href="/browse-rooms">
+            <div className="flex gap-20">
+              <Link className="hover:underline flex items-center" href="/browse-rooms">
               <Search className="mr-2"/>  Browse
               </Link>
 
-              <Link className="hover:underline" href="/your-rooms">
+              <Link className="hover:underline  flex items-center" href="/your-rooms">
                <Home className="mr-2" /> Your Rooms
               </Link>
 
-              <Link className="hover:underline" href="/create-room">
+              <Link className="hover:underline  flex items-center" href="/create-room">
                <WorkflowIcon className="mr-2" /> Create Room
               </Link>
-            </>
+            </div>
           )}
         </nav>
 
