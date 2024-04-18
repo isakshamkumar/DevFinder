@@ -23,7 +23,6 @@ import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { dummyProjects } from "@/app/data";
 import { Github, GithubIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,35 +31,22 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { generateTokenAction } from "@/lib/generateVideoToken";
 import { useEffect, useState } from "react";
-import { useCreateChatClient } from "@/app/hooks/useCreateChatClient";
 import { Skeleton } from "@/components/ui/skeleton";
-// ideally, Stream Video theme should be imported before your own styles
-// as this would make it easier for you to override certain video-theme rules
-// import './my-styles.css';
+
 
 export default function Video(props:{params:{roomId:string}}) {
   const roomId = props.params.roomId;
   console.log(roomId,'roomid');
   
-  // // const room = dummyProjects.find((proj) => proj.id === parseInt(roomId));
-  // const [client, setClient] = useState<any>(null);
-  // const[call,setCall]=useState<any>(null)
-   
   const apiKey = "ezumkcut4wyx";
-  // const router = useRouter();
-  // const session=useSession()
+
   const[proj,setproj]=useState<any>(null);
   const [client, setClient] = useState<any>(null);
   const [call, setCall] = useState<any>(null);
   const router = useRouter();
   const session=useSession();
 
-   
-  // const chatClient = useCreateChatClient({
-  //   apiKey,
-  //   tokenOrProvider: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2x1bXBzOGN4MDAwMHR0dzVoaHRldTl3YyJ9.SYLc9aOKoQ0vei4-Pq2NDgzxEPFSTa2ZLtIX-HlQagQ",
-  //   userData: user,
-  // });
+
   useEffect(() => {
     const getRoomDetails=async()=>{
       const response=await fetch('/api/get-room',{
@@ -124,28 +110,6 @@ export default function Video(props:{params:{roomId:string}}) {
     return <div>Initializing video client...</div>;
  }
 
- 
-  // const token =
-    // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaGkifQ.4DNFJe95SXMbsXIvVt_AKHOZI22Bgh1uHeCHa3-UdfY";
-  // const user: User = { id: userId,name:userName,image:userImage};
-  /**user: {
-    id: userId,
-    name: userName,
-  
-    image: userImage,
-  } */
-  // const client = new StreamVideoClient({ apiKey, user  , tokenProvider: async()=> await generateTokenAction(userId) });
-  // const call = client.call("default", "my-firstt-call");
-  // call.join({ create: true });
-    // const { setTheme } = useTheme();
-   
-
-     
-    // if (!chatClient || !client) return <div>No chat or video client</div>;
-    // const channel = chatClient!.channel('messaging', `channel-id-${userId}`, {
-    //   name: 'Channel Name',
-    //   members: [userId],
-    //  });
     return (
       <div className="grid grid-cols-4 min-h-screen ">
     
@@ -181,7 +145,7 @@ export default function Video(props:{params:{roomId:string}}) {
               <CardDescription>{proj.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2 flex-wrap">
-              {proj.tags.split(",").map((tag, id) => (
+              {proj.tags.split(",").map((tag:string, id:number) => (
                 <Badge
                   key={id}
                   className="px-3 py-1 bg-slate-300"

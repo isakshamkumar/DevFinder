@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
-import { dummyProjects } from "@/app/data";
+// import { dummyProjects } from "@/app/data";
 import { Badge } from "@/components/ui/badge";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import ReactPlayer from "react-player";
 import VideoPlayer from "./components/VideoPlayer";
-import { Meteors } from "@/components/ui/meteor";
+// import { Meteors } from "@/components/ui/meteor";
 import { Separator } from "@/components/ui/separator";
 import { getRoom } from "@/lib/getRooms";
 
@@ -46,7 +46,7 @@ const Page =async (props: { params: { roomId: string } }) => {
             {description}
           </CardDescription>
           <div className="flex gap-3 flex-wrap my-4">
-            {tags.split(",").map((tag, index) => (
+            {tags.split(",").map((tag:string, index:number) => (
               <Badge variant={"default"} key={index} className=" px-3 py-1 rounded-md">
                 {tag}
               </Badge>
@@ -64,7 +64,7 @@ const Page =async (props: { params: { roomId: string } }) => {
                   Screenshots
                 </h3>
                 <div className="flex flex-wrap">
-                  {screenshots.map((screenshot, index) => (
+                  {screenshots.map((screenshot:any, index:number) => (
                     <Dialog key={index}>
                       <DialogTrigger >
                         <img
@@ -92,7 +92,7 @@ const Page =async (props: { params: { roomId: string } }) => {
                   Videos
                 </h3>
                 <div className="flex w-full flex-wrap">
-                  {videos.map((video, index) => (
+                  {videos.map((video:any, index:number) => (
                    
                       <VideoPlayer key={index} video={video} index={index} />
                   

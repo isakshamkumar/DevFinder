@@ -1,5 +1,5 @@
 // import { CreateRoomForm } from '@/components/Forms/CreateRoomForm'
-import CreateRoomForm from '@/components/Forms/CreateRoomForm'
+import CreateRoomForm from '@/components/forms/createRoomForm'
 import { AnimatedInput } from '@/components/ui/AnimatedInput'
 import React from 'react'
 

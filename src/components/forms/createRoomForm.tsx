@@ -13,9 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge"
 
-import { Input } from "@/components/ui/input";
 import { AnimatedInput } from "../ui/AnimatedInput";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -199,7 +197,7 @@ async  function onSubmit(values: z.infer<typeof formSchema>) {
                 </FormItem>
               )}
             />
-            <Button onClick={()=>onSubmit(form.watch())} disabled={loading} >Submit</Button>
+            <Button onClick={()=>onSubmit(form.watch())} disabled={loading} >{loading? 'Creating Room...':'Submit'}</Button>
           </form>
         <Image width={400} quality={90} height={300} src={"/dev.jpeg"} style={{flex:'2 1 0%'}}  className="object-cover" alt=""/>
       </div>

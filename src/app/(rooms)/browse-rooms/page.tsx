@@ -9,19 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-
 import { Slider } from "@/components/ui/slider";
-// import { Meteors } from "@/components/ui/meteor";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
 import {
   Card,
   CardContent,
@@ -36,11 +24,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Github } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-// import { dummyProjects } from "@/app/data";
+import {Room} from '@prisma/client'
 import { getRooms } from "@/lib/getRooms";
 const SideFilterBar = () => {
-  
-  const [projects, setprojects] = useState([]);
+  const searchParams=useSearchParams()
+ 
+  const [projects, setprojects] = useState<Room[]>([]);
 
    
 
@@ -51,8 +40,8 @@ const SideFilterBar = () => {
     stars: 0, // Default range for stars
   });
   const [loading, setloading] = useState(false);
-  const[allTags,setAllTags]=useState([])
-  const handleInputChange = (e) => {
+  const[allTags,setAllTags]=useState<string[]>([])
+  const handleInputChange = (e:any) => {
     const { name, value } = e.target;
     setFilters((prevState) => ({
       ...prevState,
@@ -60,7 +49,7 @@ const SideFilterBar = () => {
     }));
   };
 
-  const handleStarsChange = (e) => {
+  const handleStarsChange = (e:any) => {
     console.log(e, "value");
 
     setFilters((prevState) => ({
@@ -68,8 +57,7 @@ const SideFilterBar = () => {
       stars: e[0],
     }));
   };
-  const searchParams=useSearchParams()
- 
+
   
 
   useEffect(() => {
@@ -92,7 +80,7 @@ const SideFilterBar = () => {
       const projectName= searchParams.get("projectName") || "";
     const language= searchParams.get("language") || "";
     const stars= Number(searchParams.get("stars")) || 0;
-    const rooms = await getRooms(projectName,language,stars);
+    const rooms:Room[] = await getRooms(projectName,language,stars);
      
          const tags= rooms.flatMap((project) => project.tags.split(","));
          //now check if tags do not repeat
@@ -218,7 +206,7 @@ router.push(`/browse-rooms`)
       >
         {!loading ? (
           <>
-            {projects.map((proj) => (
+            {projects?.map((proj) => (
               <Card
                 key={proj.id}
                 style={{ backdropFilter: "blur(190px)" }}
@@ -249,6 +237,9 @@ router.push(`/browse-rooms`)
                   <span className="text-xl underline text-gray-200">
                     Project Github Link
                   </span>{" "}
+                  {/* <CardTitle className="text-2xl block text-gray-300">
+                    Stars: {getProjStars([proj.])}
+                  </CardTitle> */}
                 </Link>
                 <Button className="block ml-5 mt-5 bg-slate-200">
                   <Link href={`/browse-rooms/${proj.id}`}>View Room</Link>{" "}

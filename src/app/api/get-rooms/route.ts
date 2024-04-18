@@ -11,6 +11,7 @@ let whereClause = {};
 // Check if projectName is not an empty string
 // Check if projectName is not an empty string
 if (projectName !== '') {
+  //@ts-ignore
   whereClause.name = {
     contains: projectName,
     mode: 'insensitive'
@@ -19,6 +20,7 @@ if (projectName !== '') {
 
 // Check if language is not an empty string
 if (language !== '') {
+  //@ts-ignore
   whereClause.tags = {
     contains: language,
     mode: 'insensitive'
@@ -27,12 +29,13 @@ if (language !== '') {
 
 // Check if stars is not null
 if (stars !== '') {
+  //@ts-ignore
   whereClause.stars = Number(stars);
 }
 const rooms = await prisma.room.findMany({
   where: whereClause,
 });
-  console.log(rooms,'roooms from server');
+
   
 
   return NextResponse.json({ rooms });

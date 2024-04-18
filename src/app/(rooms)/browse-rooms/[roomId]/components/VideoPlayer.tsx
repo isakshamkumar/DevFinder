@@ -2,9 +2,12 @@
 import React, { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
 
-type Props = {}
+type VideoPlayer = {
+index:number;
+ video:any;
+}
 
-const VideoPlayer = ({index,video}) => {
+const VideoPlayer:React.FC<VideoPlayer> = ({index,video}) => {
     const [mount,setmount]=useState(false)
     useEffect(()=>{
 setmount(true)
