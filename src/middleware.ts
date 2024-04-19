@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   const isPublicPath = path === "/";
   console.log(request.cookies, "cookies");
 
-  const token = request.cookies.get("next-auth.session-token");
+  const token = request.cookies.get("next-auth.session-token") || request.cookies.get("__Secure-next-auth.session-token");
   console.log(token);
 
   if (isPublicPath && token) {
