@@ -12,7 +12,7 @@ export const getRooms = async (
 };
 
 export const getRoom = async (id: string) => {
-  const response = await fetch("/api/get-room", {
+  const response = await fetch("https://dev-finder-mocha.vercel.app/api/get-room", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -24,7 +24,7 @@ export const getRoom = async (id: string) => {
 };
 
 export const getUserRooms = async (id: string) => {
-  const response = await fetch("/api/get-user-rooms", {
+  const response = await fetch("https://dev-finder-mocha.vercel.app/api/get-user-rooms", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
