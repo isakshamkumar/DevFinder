@@ -8,10 +8,10 @@ export function middleware(request: NextRequest) {
   console.log(request.cookies, "cookies");
 
   const token = request.cookies.get("next-auth.session-token");
-  console.log(token, "toend");
+  console.log(token);
 
   if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/", request.nextUrl));
+    return NextResponse.redirect(new URL("/browse-rooms", request.nextUrl));
   }
   console.log(process.env.NEXT_PUBLIC_CALL_BACK_URL, "urlsasadsad");
   const url = process.env.NEXT_PUBLIC_CALL_BACK_URL;

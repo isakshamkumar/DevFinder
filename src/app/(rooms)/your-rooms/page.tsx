@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react";
 import { Room } from "@prisma/client";
 const SideFilterBar = () => {
   const [projects, setprojects] = useState<Room[]>([]);
-
+const[loading,setloading]=useState(true)
   const session = useSession();
 
   //@ts-ignore
@@ -27,13 +27,18 @@ const SideFilterBar = () => {
   useEffect(() => {
     const getAllRooms = async () => {
       const rooms = await getUserRooms(userId || "");
+      
       setprojects(rooms);
-      console.log(rooms);
+      setloading(false)
+      // console.log(rooms);
     };
     getAllRooms();
   }, [userId]);
   if (!session.data) {
     return <div>No session</div>;
+  }
+  if(loading){
+    return <div>Getting Your Rooms...</div>
   }
 
   return (
