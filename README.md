@@ -21,9 +21,9 @@ Sample Room
 
 ![Screenshot from 2024-04-24 12-03-49](https://github.com/isakshamkumar/DevFinder/assets/124489667/2a6a3942-2e58-4b9e-aea4-971e00c67ea8)
 
-Real time Video Collabora
+Real time Video Collaboration
 ![Screenshot from 2024-04-24 12-05-56](https://github.com/isakshamkumar/DevFinder/assets/124489667/7e790105-09fb-4558-96f7-a048a60fc914)
-tion
+
 
 ## Technologies Used
 
