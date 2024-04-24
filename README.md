@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+![Screenshot from 2024-04-24 12-03-49](https://github.com/isakshamkumar/DevFinder/assets/124489667/6a3e835a-3aba-457d-80e2-95af61bfcf39)DevFinder
+DevFinder is a collaborative platform designed for developers worldwide to connect, collaborate, and solve coding issues while promoting open-source contributions. Whether you're stuck on a problem, seeking collaboration, or eager to share your knowledge, DevFinder provides a space where developers can come together to support each other's endeavors.
 
-## Getting Started
+Features
+Room Creation: Users can create rooms where they specify the title, issue they are facing, description, and relevant details such as image URLs, video URLs, GitHub links, hosted links, and the tech stack used.
+Browsing Rooms: External viewers can browse available rooms, filter them based on criteria like tech stack, GitHub stars, and more.
+Room Details: Users can view detailed information about each room, including the problem statement, description, relevant links, and the tech stack used.
+Joining Rooms: Interested users can join rooms to collaborate with the room creator and other participants.
 
-First, run the development server:
+Video Connectivity: DevFinder integrates WebRTC via the GetStreamIO package, enabling seamless video connectivity between room creators and joiners for real-time collaboration.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Landing Page
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![Screenshot from 2024-04-24 12-01-59](https://github.com/isakshamkumar/DevFinder/assets/124489667/c1f6a96f-0acc-4c67-8725-4a976b8ffc93)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Browse Rooms
+![Screenshot from 2024-04-24 12-00-22](https://github.com/isakshamkumar/DevFinder/assets/124489667/299e2ac8-ecf9-42d0-acc7-734a39e1c715)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Sample Room
 
-## Learn More
+![Screenshot from 2024-04-24 12-03-49](https://github.com/isakshamkumar/DevFinder/assets/124489667/2a6a3942-2e58-4b9e-aea4-971e00c67ea8)
 
-To learn more about Next.js, take a look at the following resources:
+Real time Video Collabora
+![Screenshot from 2024-04-24 12-05-56](https://github.com/isakshamkumar/DevFinder/assets/124489667/7e790105-09fb-4558-96f7-a048a60fc914)
+tion
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Technologies Used
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- **Frontend**: Next.js 13, React
+- **Backend**: Node.js
+- **Database**: PostgreSQL, Prisma
+- **WebRTC Integration**: GetStreamIO
+- **UI Framework**: Tailwind CSS, Shadcn
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
