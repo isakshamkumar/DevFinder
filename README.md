@@ -1,4 +1,5 @@
-![Screenshot from 2024-04-24 12-03-49](https://github.com/isakshamkumar/DevFinder/assets/124489667/6a3e835a-3aba-457d-80e2-95af61bfcf39)DevFinder
+### DevFinder
+
 DevFinder is a collaborative platform designed for developers worldwide to connect, collaborate, and solve coding issues while promoting open-source contributions. Whether you're stuck on a problem, seeking collaboration, or eager to share your knowledge, DevFinder provides a space where developers can come together to support each other's endeavors.
 
 Features
