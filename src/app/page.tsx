@@ -53,26 +53,3 @@ export default async function Hero() {
     </section>
   );
 }
-
-// const tools = [
-//   {
-//     link: "https://www.typescriptlang.org/",
-//     icon: BrandIcons.ts,
-//   },
-//   {
-//     link: "https://nextjs.org/",
-//     icon: BrandIcons.nextjs,
-//   },
-//   {
-//     link: "https://tailwindcss.com/",
-//     icon: BrandIcons.tailwind,
-//   },
-//   {
-//     link: "https://www.prisma.io/",
-//     icon: BrandIcons.prisma,
-//   },
-//   {
-//     link: "https://vercel.com/",
-//     icon: BrandIcons.vercel,
-//   },
-// ];
