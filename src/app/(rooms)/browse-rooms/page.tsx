@@ -167,12 +167,14 @@ router.push(`/browse-rooms`)
               <SelectValue placeholder="Filter by Language" />
             </SelectTrigger>
             <SelectContent>
-              {allTags?.map((tag, index) => (
-                <SelectItem value={tag} key={index}>
-                  {tag}
-                </SelectItem>
-              ))}
-            </SelectContent>
+    {allTags
+      ?.filter((tag) => tag.trim() !== "")
+      .map((tag, index) => (
+        <SelectItem value={tag} key={index}>
+          {tag}
+        </SelectItem>
+      ))}
+  </SelectContent>
           </Select>
           <Separator className="h-[0.5px] bg-black dark:bg-white  rounded-2xl" />
           <div className="space-y-2 my-2">
