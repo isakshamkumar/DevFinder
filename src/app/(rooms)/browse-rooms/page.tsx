@@ -1,291 +1,178 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { useRouter,useSearchParams } from "next/navigation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Github } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import {Room} from '@prisma/client'
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Room } from "@prisma/client";
 import { getRooms } from "@/lib/getRooms";
-const SideFilterBar = () => {
-  const searchParams=useSearchParams()
- 
-  const [projects, setprojects] = useState<Room[]>([]);
+import { FilterSection } from "@/components/FilterSection";
+import { ProjectCard } from "@/components/ProjectCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 
-   
+type FilterState = {
+  projectName: string;
+  language: string;
+  stars: number;
+};
 
-  const router = useRouter();
-  const [filters, setFilters] = useState({
-    projectName: "",
-    language: "",
-    stars: 0, // Default range for stars
-  });
-  const [loading, setloading] = useState(false);
-  const[allTags,setAllTags]=useState<string[]>([])
-  const handleInputChange = (e:any) => {
-    const { name, value } = e.target;
-    setFilters((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+const useRooms = (initialFilters: FilterState) => {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [allTags, setAllTags] = useState<string[]>([]);
 
-  const handleStarsChange = (e:any) => {
-    console.log(e, "value");
-
-    setFilters((prevState) => ({
-      ...prevState,
-      stars: e[0],
-    }));
-  };
-
-  
+  const fetchRooms = useCallback(async () => {
+    setLoading(true);
+    try {
+      const fetchedRooms = await getRooms("", "", 0);
+      setAllRooms(fetchedRooms);
+      const tags: string[] = fetchedRooms.flatMap((room: Room) => room.tags);
+      const uniqueTags = Array.from(new Set(tags)).filter(
+        (tag) => tag.trim() !== ""
+      );
+      setAllTags(uniqueTags);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setloading(true);
-    const projectName= searchParams.get("projectName") || "";
-    const language= searchParams.get("language") || "";
-    const stars= Number(searchParams.get("stars")) || 0;
-    console.log(projectName, language, stars,'sdfaasd');
-    
-    const getAllRooms = async () => {
-      const rooms = await getRooms(projectName,language,stars);
-      setprojects(rooms);
-      setloading(false);
-    };
-    getAllRooms();
+    fetchRooms();
+  }, [fetchRooms]);
 
-  }, [searchParams]);
-  useEffect(()=>{
-    const getAllRooms = async () => {
-      const projectName= searchParams.get("projectName") || "";
-    const language= searchParams.get("language") || "";
-    const stars= Number(searchParams.get("stars")) || 0;
-    const rooms:Room[] = await getRooms(projectName,language,stars);
-     
-         const tags= rooms.flatMap((project) => project.tags.split(","));
-         //now check if tags do not repeat
-         const uniqueTags = tags.filter((tag, index) => tags.indexOf(tag) === index);
-        setAllTags(uniqueTags)
-    };
-    getAllRooms();
-  },[])
+  const filterRooms = useCallback(
+    (filters: FilterState) => {
+      const filteredRooms = allRooms.filter(
+        (room) =>
+          (filters.projectName === "" ||
+            room.name
+              .toLowerCase()
+              .includes(filters.projectName.toLowerCase())) &&
+          (filters.language === "" || room.tags.includes(filters.language)) &&
+          room.stars! >= filters.stars
+      );
+      setRooms(filteredRooms);
+    },
+    [allRooms]
+  );
 
-  const handleApplyFilters = () => {
-    if (filters.language === "" || filters.projectName === "") {
-      alert("Please Apply Appropriate Settings");
-      return;
+  useEffect(() => {
+    filterRooms(initialFilters);
+  }, [initialFilters, filterRooms]);
+
+  return { rooms, loading, allTags, filterRooms };
+};
+
+const BrowseRooms: React.FC = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [filters, setFilters] = useState<FilterState>({
+    projectName: searchParams.get("projectName") || "",
+    language: searchParams.get("language") || "",
+    stars: Number(searchParams.get("stars")) || 0,
+  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const { rooms, loading, allTags, filterRooms } = useRooms(filters);
+
+  const handleApplyFilters = useCallback(() => {
+    const query = Object.entries(filters)
+      .filter(([_, value]) => value !== "")
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join("&");
+    router.push(`/browse-rooms?${query}`);
+    filterRooms(filters);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
     }
-    if (projects) {
-      // Construct query string based on filters
-      const query = Object.entries(filters)
-        .filter(
-          ([key, value]) =>
-            key !== "language" || (key === "language" && value !== "")
-        )
-        .map(([key, value]) => {
-          if (Array.isArray(value)) {
-            return `${key}=${value.join("-")}`;
-          }
-          return `${key}=${value}`;
-        })
-        .join("&");
+  }, [filters, router, filterRooms]);
 
-      // Push the filtered route to the router
-      router.push(`/browse-rooms?${query}`);
+  const handleRemoveFilters = useCallback(() => {
+    const defaultFilters = { projectName: "", language: "", stars: 0 };
+    setFilters(defaultFilters);
+    router.push("/browse-rooms");
+    filterRooms(defaultFilters);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
     }
+  }, [router, filterRooms]);
+
+  useEffect(() => {
+    filterRooms(filters);
+  }, [filters, filterRooms]);
+
+  const displayedRooms = useMemo(() => {
+    return rooms.filter(
+      (room) =>
+        room.name.toLowerCase().includes(filters.projectName.toLowerCase()) &&
+        (filters.language === "" || room.tags.includes(filters.language)) &&
+        room.stars! >= filters.stars
+    );
+  }, [rooms, filters]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
-  const handleRemoveFilter=async()=>{
-router.push(`/browse-rooms`)
-  }
 
   return (
-    <div className="flex  relative ">
+    <div className="flex relative">
+    <div
+      className="fixed top-88 inset-x-0 -z-10 transform-gpu overflow-hidden blur-3xl"
+      aria-hidden="true"
+    >
       <div
-        className="fixed top-88 inset-x-0 -z-10 transform-gpu overflow-hidden blur-3xl "
-        aria-hidden="true"
-      >
-        <div
-          className="relative left-[calc(30%)] aspect-[1155/678] w-[60rem] h-[30] top-[-10rem] rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-        />
-      </div>
-      <div
-        className="bg-transparent p-4 rounded-md border h-screen shadow-md "
+        className="relative left-[calc(30%)] aspect-[1155/678] w-[60rem] h-[30] top-[-10rem] rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
         style={{
-          flex: " 1 1 0%",
-          minWidth: "240px",
-          position: "sticky",
-          top: "0",
+          clipPath:
+            "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
         }}
-      >
-        <div className=" sticky top-24 left-0  h-[400px] flex flex-col gap-4 p-4">
-          <h2 className="text-2xl font-semibold mb-2">Filters</h2>
-          <input
-            type="text"
-            name="projectName"
-            value={filters.projectName}
-            onChange={handleInputChange}
-            placeholder="Filter by Project Name"
-            className="w-full p-2 mb-4 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
-          />
+      />
+    </div>
 
-          <Separator className=" bg-black dark:bg-white  rounded-2xl" />
+    <Button
+      className="lg:hidden fixed top-20 left-3 z-50"
+      onClick={toggleSidebar}
+    >
+      <Menu />
+    </Button>
 
-          <Select
-            value={filters.language}
-            onValueChange={(value) =>
-              setFilters((prevState) => ({
-                ...prevState,
-                language: value,
-              }))
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter by Language" />
-            </SelectTrigger>
-            <SelectContent>
-    {allTags
-      ?.filter((tag) => tag.trim() !== "")
-      .map((tag, index) => (
-        <SelectItem value={tag} key={index}>
-          {tag}
-        </SelectItem>
-      ))}
-  </SelectContent>
-          </Select>
-          <Separator className="h-[0.5px] bg-black dark:bg-white  rounded-2xl" />
-          <div className="space-y-2 my-2">
-            <label htmlFor="label">
-              Filter By Repo Stars{">="} {filters.stars}
-            </label>
+    <FilterSection
+      filters={filters}
+      setFilters={setFilters}
+      allTags={allTags}
+      onApplyFilters={handleApplyFilters}
+      onRemoveFilters={handleRemoveFilters}
+      isOpen={isSidebarOpen}
+    />
 
-            <Slider
-              id="label"
-              name="stars"
-              onValueChange={handleStarsChange}
-              defaultValue={[0]}
-              min={0}
-              max={100}
-              step={25}
-            />
-          </div>
-          <Separator className="h-[0.5px] bg-black dark:bg-white  rounded-2xl" />
-
-          <Button onClick={handleApplyFilters} variant={"destructive"}>
-            Apply Filters
-          </Button>
-          <Button onClick={handleRemoveFilter} variant={"destructive"}>
-            Remove Filters
-          </Button>
-        </div>
-      </div>
-      <div
-        style={{ flex: "4 4 0%" }}
-        className="relative grid grid-col-1 lg:grid-cols-2  xl:grid-cols-3 gap-5 pl-6  h-full"
-      >
-        {!loading ? (
-          <>
-            {projects?.map((proj) => (
-              <Card
-                key={proj.id}
-                style={{ backdropFilter: "blur(190px)" }}
-                className=" p-2 pb-4 h-fit min-h-[310px] S bg-transparent"
+    <div className="flex-grow p-4 lg:ml-64">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        {loading ? (
+          Array(6)
+            .fill(0)
+            .map((_, index) => (
+              <Skeleton
+                key={index}
+                className="p-2 flex justify-center items-center pb-4 h-fit min-h-[310px] min-w-[300px]"
               >
-                <CardHeader>
-                  <CardTitle className="text-3xl text-gray-300">
-                    {proj.name}
-                  </CardTitle>
-                  <CardDescription>{proj.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex gap-2 flex-wrap">
-                  {proj.tags.split(",").map((tag, id) => (
-                    <Badge
-                      key={id}
-                      className="px-3 py-1 bg-slate-300"
-                      variant="default"
-                    >
-                      <Link href={"/"}>{tag}</Link>{" "}
-                    </Badge>
-                  ))}
-                </CardContent>
-                <Link
-                  className={cn(buttonVariants({ variant: "link" }))}
-                  href={"/"}
-                >
-                  <Github className="mr-2" />{" "}
-                  <span className="text-xl underline text-gray-200">
-                    Project Github Link
-                  </span>{" "}
-                  {/* <CardTitle className="text-2xl block text-gray-300">
-                    Stars: {getProjStars([proj.])}
-                  </CardTitle> */}
-                </Link>
-                <Button className="block ml-5 mt-5 bg-slate-200">
-                  <Link href={`/browse-rooms/${proj.id}`}>View Room</Link>{" "}
-                </Button>
-              </Card>
-            ))}
-          </>
+                Getting Rooms...
+              </Skeleton>
+            ))
+        ) : displayedRooms.length > 0 ? (
+          displayedRooms.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))
         ) : (
-          <>
-            <div
-              style={{ flex: "4 4 0%" ,width:'calc(100vw - 35rem)'}}
-              className="relative grid grid-col-1 lg:grid-cols-2  xl:grid-cols-3 gap-5 pl-6   h-full"
-            >
-              {[1, 2, 3, 4, 5].map((ele, index) => (
-                <Skeleton
-                  key={index}
-                  className="p-2 flex justify-center items-center pb-4 h-fit min-h-[310px] min-w-[300px] "
-                >Getting Rooms...</Skeleton>
-              ))}
-            </div>
-          </>
+          <div className="col-span-full text-center text-gray-500">
+            No rooms match the current filters.
+          </div>
         )}
-        {/* <div className="border border-red-500"> */}
-
-        {/* <Pagination className="absolute bottom-0 ">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            // <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination> */}
-        {/* </div> */}
       </div>
     </div>
+  </div>
   );
 };
 
-export default SideFilterBar;
+export default BrowseRooms;

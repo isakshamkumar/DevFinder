@@ -21,7 +21,6 @@ const SideFilterBar = () => {
 const[loading,setloading]=useState(true)
   const session = useSession();
 
-  //@ts-ignore
   const userId = session.data?.user?.id;
 
   useEffect(() => {
@@ -30,7 +29,6 @@ const[loading,setloading]=useState(true)
       
       setprojects(rooms);
       setloading(false)
-      // console.log(rooms);
     };
     getAllRooms();
   }, [userId]);
@@ -65,7 +63,7 @@ const[loading,setloading]=useState(true)
                 <CardDescription>{proj.description}</CardDescription>
               </CardHeader>
               <CardContent className="flex gap-2 flex-wrap">
-                {proj.tags.split(",").map((tag, id) => (
+                {proj.tags.map((tag, id) => (
                   <Badge
                     key={id}
                     className="px-3 py-1 bg-slate-300"

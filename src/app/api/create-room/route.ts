@@ -1,53 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from '@/db/Client'
+import { getServerSession } from "next-auth/next";
+import { authOption } from "@/lib/auth";
+import prisma from "@/db/Client";
 export async function POST(req: NextRequest, res: NextResponse) {
-  const {
-    projectname,
-    projectdescription,
-    projectgithub,
-    projectlivelink,
-    issue,
-    tags,
-    id
-  } = await req.json();
-  console.log(projectname,
-    projectdescription,
-    projectgithub,
-    projectlivelink,
-    issue,
-    tags,
-    id);
-  
-const user= await prisma.user.findUnique({
-  where:{
-    id
-  }
-})
-/**
- *  screenshots:['https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg'],
-      issue: "Facing difficulty in setting up Redux store.",
-      videos:['https://courseify.s3.amazonaws.com/React+App+and+12+more+pages+-+Personal+-+Microsoft%E2%80%8B+Edge+2023-11-18+00-50-28.mp4','https://courseify.s3.amazonaws.com/React+App+and+12+more+pages+-+Personal+-+Microsoft%E2%80%8B+Edge+2023-11-18+00-50-28.mp4','https://courseify.s3.amazonaws.com/React+App+and+12+more+pages+-+Personal+-+Microsoft%E2%80%8B+Edge+2023-11-18+00-50-28.mp4',]
-    },
- */
-if(user){
-  const newRoom= await prisma.room.create({
-    data:{
-      name:projectname,
-      description:projectdescription,
-      github:projectgithub,
-      liveLink:projectlivelink,
-      issue:issue,
-      tags:tags,
-      screenshots:['https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg','https://courseify.s3.amazonaws.com/WhatsApp+Image+2023-12-05+at+01.06.57_2f7a8437.jpg'],
-      videos:['https://courseify.s3.amazonaws.com/React+App+and+12+more+pages+-+Personal+-+Microsoft%E2%80%8B+Edge+2023-11-18+00-50-28.mp4','https://courseify.s3.amazonaws.com/React+App+and+12+more+pages+-+Personal+-+Microsoft%E2%80%8B+Edge+2023-11-18+00-50-28.mp4','https://courseify.s3.amazonaws.com/React+App+and+12+more+pages+-+Personal+-+Microsoft%E2%80%8B+Edge+2023-11-18+00-50-28.mp4'],
-      user:{
-        connect:{
-          id:id
-        }
-      }
+  try {
+    const {
+      projectName,
+      projectDescription,
+      projectGithub,
+      projectLiveLink,
+      issue,
+      tags,
+      screenshots,
+      video,
+      id,
+    } = await req.json();
+
+    if (
+      !projectName ||
+      !projectDescription ||
+      !projectGithub ||
+      !issue ||
+      !tags
+    ) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
     }
-  })
-  return NextResponse.json({ newRoom });
-}
-  // console.log("token", token);
+
+    const processedTags = tags.split(",").map((tag: string) => tag.trim());
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const newRoom = await prisma.room.create({
+      data: {
+        name: projectName,
+        description: projectDescription,
+        github: projectGithub,
+        liveLink: projectLiveLink || "",
+        issue: issue,
+        tags: processedTags,
+        screenshotKeys: screenshots || [],
+        videoKeys: video,
+        user: {
+          connect: {
+            id: id,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({ newRoom }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating room:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

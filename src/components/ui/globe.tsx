@@ -135,7 +135,6 @@ export function Globe({ globeConfig, data }: WorldProps) {
       });
     }
 
-    // remove duplicates for same lat and lng
     const filteredPoints = points.filter(
       (v, i, a) =>
         a.findIndex((v2) =>
@@ -234,15 +233,9 @@ export function WebGLRendererConfig() {
   const { gl, size } = useThree();
 
   useEffect(() => {
-    if(window){
-        if(typeof window!=='undefined'){
-            gl.setPixelRatio(window.devicePixelRatio);
-        }
-       
-        gl.setSize(size.width, size.height);
-        gl.setClearColor(0xffaaff, 0);
-    }
-   
+    gl.setPixelRatio(window.devicePixelRatio);
+    gl.setSize(size.width, size.height);
+    gl.setClearColor(0xffaaff, 0);
   }, []);
 
   return null;

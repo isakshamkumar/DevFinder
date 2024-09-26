@@ -1,18 +1,17 @@
-// import prisma from '../db/Client'
 export const getRooms = async (
   projectName: string,
   language: string,
   stars: number
 ) => {
   const response = await fetch(
-    `/api/get-rooms?project=${projectName}&language=${language}&stars`
+    `https://devfinderr.skumar.site/api/get-rooms?project=${projectName}&language=${language}&stars`
   );
   const data = await response.json();
   return data.rooms;
 };
 
 export const getRoom = async (id: string) => {
-  const response = await fetch("https://dev-finder-mocha.vercel.app/api/get-room", {
+  const response = await fetch("https://devfinderr.skumar.site/api/get-room", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -24,7 +23,7 @@ export const getRoom = async (id: string) => {
 };
 
 export const getUserRooms = async (id: string) => {
-  const response = await fetch("https://dev-finder-mocha.vercel.app/api/get-user-rooms", {
+  const response = await fetch("https://devfinderr.skumar.site/api/get-user-rooms", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -34,3 +33,12 @@ export const getUserRooms = async (id: string) => {
   const data = await response.json();
   return data.rooms;
 };
+export const fetchUserRoomDetails = async (roomId: string) => {
+  const response = await fetch("https://devfinderr.skumar.site/api/get-room", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ roomId }),
+  });
+  const data = await response.json();  
+  return data.room;
+}

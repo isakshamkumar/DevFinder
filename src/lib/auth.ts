@@ -15,14 +15,14 @@ export const authOption={
     session: {
         strategy: "jwt",
       },
-    secret: "this_is_secret",
+    secret: process.env.NEXTAUTH_SECRET ?? 'secret',
     providers: [
         GoogleProvider({
             clientId:
              process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
             clientSecret:
-            process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!
-          }),
+            process.env.GOOGLE_CLIENT_SECRET!
+          })
     ],
     callbacks: {
       async jwt({ token, user }) {

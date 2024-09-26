@@ -1,19 +1,14 @@
-// import { CreateRoomForm } from '@/components/Forms/CreateRoomForm'
-import CreateRoomForm from '@/components/forms/createRoomForm'
-import { AnimatedInput } from '@/components/ui/AnimatedInput'
-import React from 'react'
+import CreateRoomForm from "@/components/forms/createRoomForm";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const page = (props: Props) => {
   return (
-    <h2>
-      {/* h2 */}
-{/* <AnimatedInput placeholder='dfnknldn'/> */}
-<CreateRoomForm/>
-    </h2>
+    <main>
+      <CreateRoomForm />
+    </main>
+  );
+};
 
-  )
-}
-
-export default page
+export default page;

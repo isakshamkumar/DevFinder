@@ -56,19 +56,19 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-model Room{
-  id String @id @default(cuid())
-  name String
-  description String
-  github String 
-  liveLink String
-  issue String
-  tags String
-  screenshots String[]
-  stars Int? @default(0)
-  videos String[]
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete:Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Room {
+  id            String    @id @default(cuid())
+  name          String
+  description   String
+  github        String 
+  liveLink      String
+  issue         String
+  tags          String[]  // Changed from String to String[]
+  screenshotKeys String[] // Changed from screenshots String[] to screenshotKeys String[]
+  stars         Int?      @default(0)
+  videoKeys     String[]  // Changed from videos String[] to videoKeys String[]
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
